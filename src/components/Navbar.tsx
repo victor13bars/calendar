@@ -5,14 +5,13 @@ import {RouteNames} from "../router";
 import {useTypedSelector} from "../hooks/useTypedselector";
 import {useDispatch} from "react-redux";
 import {AuthActionCreators} from "../store/reducers/auth/action-creators";
+import {useActions} from "../hooks/useActions";
 
 const Navbar: FC = () => {
     const router = useHistory()
     const {isAuth, user} = useTypedSelector(state => state.auth)
     const dispatch = useDispatch()
-    const logout = () => {
-        dispatch(AuthActionCreators.logout())
-    }
+    const {logout} = useActions()
     return (
         <Layout.Header>
             <Row justify='end'>
