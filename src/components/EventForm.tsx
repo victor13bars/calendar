@@ -1,24 +1,27 @@
 import React, {FC, useState} from 'react';
 import {Button, DatePicker, Form, Input, Row, Select} from "antd";
 import {rules} from "../utils/rules";
-import {useDispatch} from "react-redux";
-import {AuthActionCreators} from "../store/reducers/auth/action-creators";
-import {useTypedSelector} from "../hooks/useTypedselector";
-import {useActions} from "../hooks/useActions";
+import {IUser} from "../models/IUser";
+import {IEvent} from "../models/IEvent";
 
-const EventForm: FC = () => {
-    const dispatch = useDispatch()
-    const {error, isLoading} = useTypedSelector(state => state.auth)
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const {login} = useActions()
-    const submit = () => {
-        login(username, password)
-    }
+interface EventFormProps {
+    guests: IUser[]
+}
+
+const EventForm: FC<EventFormProps> = ({guests}) => {
+    const [event, setEvent] = useState<IEvent>({
+        author: '',
+        date: '',
+        description: '',
+        guest: ''
+    } as IEvent)
+    // const submit = () => {
+    //     login(username, password)
+    // }
 
     return (
         <Form
-            onFinish={submit}
+
         >
             <Form.Item
                 label="Description event"
@@ -26,8 +29,8 @@ const EventForm: FC = () => {
                 rules={[rules.required()]}
             >
                 <Input
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
+                    value={event.description}
+                    onChange={(e) => setEvent({...event, description: e.target.value})}
                 />
             </Form.Item>
             <Form.Item
@@ -35,16 +38,24 @@ const EventForm: FC = () => {
                 name="date"
                 rules={[rules.required()]}
             >
-                <DatePicker/>
+                <DatePicker
+
+                />
             </Form.Item>
-            <Form.Item>
-                <Select>
-                    <Select.Option value="jack">Jack</Select.Option>
-                    <Select.Option value="lucy">Lucy</Select.Option>
-                    <Select.Option value="disabled" disabled>
-                        Disabled
-                    </Select.Option>
-                    <Select.Option value="Yiminghe">yiminghe</Select.Option>
+            <Form.Item
+                label='Select a guest'
+                name='guest'
+                rules={[rules.required()]}
+            >
+                <Select onChange={(guest: string) => setEvent({...event, guest})}>
+                    {guests.map(quest =>
+                        <Select.Option
+                            key={quest.username}
+                            value={quest.username}
+                        >
+                            {quest.username}
+                        </Select.Option>
+                    )}
                 </Select>
             </Form.Item>
             <Row justify='end'>
