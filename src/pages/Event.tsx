@@ -4,35 +4,46 @@ import EventCalendar from "../components/EventCalendar";
 import EventForm from "../components/EventForm";
 import {useActions} from "../hooks/useActions";
 import {useTypedSelector} from "../hooks/useTypedselector";
+import {IEvent} from "../models/IEvent";
 
 const Event: FC = () => {
-    const {fetchGuests} = useActions()
+    const {fetchGuests, createEvent, fetchEvents} = useActions()
     const [modalVisible, setModalVisible] = useState(false)
-    const {guests} = useTypedSelector(state => state.event)
+    const {guests, events} = useTypedSelector(state => state.event)
+    const {user} = useTypedSelector(state => state.auth)
 
     useEffect(() => {
         fetchGuests()
+        fetchEvents(user.username)
     }, [])
+
+    const addNewEvent = (event: IEvent) => {
+        setModalVisible(false)
+        createEvent(event)
+    }
     return (
-        <Layout>
-            <EventCalendar event={[]}/>
-            <Row justify='center'>
-                <Button
-                    type="primary"
-                    onClick={() => setModalVisible(true)}
+            <Layout>
+                <EventCalendar events={events}/>
+                <Row justify='center'>
+                    <Button
+                        type="primary"
+                        onClick={() => setModalVisible(true)}
+                    >
+                        Add Event
+                    </Button>
+                </Row>
+                <Modal
+                    title='Add Event'
+                    visible={modalVisible}
+                    footer={null}
+                    onCancel={() => setModalVisible(false)}
                 >
-                    Add Event
-                </Button>
-            </Row>
-            <Modal
-                title='Add Event'
-                visible={modalVisible}
-                footer={null}
-                onCancel={() => setModalVisible(false)}
-            >
-                <EventForm guests={guests}/>
-            </Modal>
-        </Layout>
+                    <EventForm
+                        guests={guests}
+                        submit={addNewEvent}
+                    />
+                </Modal>
+            </Layout>
     );
 };
 
